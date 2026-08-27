@@ -14,25 +14,42 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background px-5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(55% 45% at 50% 40%, oklch(0.3 0.1 330 / 45%) 0%, transparent 70%), radial-gradient(40% 40% at 78% 76%, oklch(0.32 0.1 55 / 25%) 0%, transparent 70%)",
+        }}
+      />
+      <div className="relative max-w-md text-center">
+        <h1 className="font-display text-[clamp(4rem,18vw,8rem)] leading-none font-semibold tracking-tight">
+          <span className="text-spectrum">404</span>
+        </h1>
+        <p className="mt-3 font-display text-[0.65rem] tracking-[0.34em] text-muted-foreground uppercase">
+          AI • BUILDING • CREATING
         </p>
-        <div className="mt-6">
+        <h2 className="mt-6 font-display text-xl font-semibold tracking-tight text-foreground">
+          This page isn't part of the build.
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist or has moved. Everything else is back home.
+        </p>
+        <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full px-7 py-3 font-display text-xs font-semibold tracking-[0.16em] text-primary-foreground uppercase transition-transform hover:-translate-y-0.5"
+            style={{ background: "var(--gradient-warm)" }}
           >
-            Go home
+            Back home
           </Link>
         </div>
       </div>
     </div>
   );
 }
+
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
