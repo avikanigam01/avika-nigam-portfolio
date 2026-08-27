@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="an" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff5fa2"/>
+      <stop offset="0.45" stop-color="#c04bff"/>
+      <stop offset="0.75" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#ffd54a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#050505"/>
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="none" stroke="url(#an)" stroke-opacity="0.55" stroke-width="1.5"/>
+  <text x="32" y="43" text-anchor="middle" font-family="'Space Grotesk',Verdana,sans-serif" font-size="27" font-weight="700" fill="url(#an)">AN</text>
+</svg>
