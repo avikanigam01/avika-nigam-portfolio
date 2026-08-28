@@ -44,10 +44,12 @@ export function Journey() {
                   key={milestone.id}
                   milestone={milestone}
                   index={i}
+                  total={milestones.length}
                   active={activeId === milestone.id}
                   onActivate={() => setActiveId(milestone.id)}
                 />
               ))}
+
             </ol>
           </div>
         </Reveal>
