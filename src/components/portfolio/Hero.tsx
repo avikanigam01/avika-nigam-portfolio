@@ -22,25 +22,32 @@ export function Hero({ onTalk }: { onTalk: () => void }) {
       aria-labelledby="hero-heading"
       className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-5 pt-24 pb-16 sm:px-8 sm:pt-28"
     >
-      {/* Ambient background field */}
+      {/* Ambient background field — colourful light behind the interface */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-20"
         style={{
           background:
-            "radial-gradient(60% 45% at 50% 32%, oklch(0.3 0.09 330 / 45%) 0%, transparent 70%), radial-gradient(45% 40% at 82% 78%, oklch(0.32 0.1 55 / 26%) 0%, transparent 70%), radial-gradient(40% 40% at 14% 74%, oklch(0.3 0.1 300 / 26%) 0%, transparent 70%)",
+            "radial-gradient(58% 42% at 50% 34%, oklch(0.42 0.19 332 / 42%) 0%, transparent 72%), radial-gradient(44% 38% at 84% 76%, oklch(0.46 0.17 55 / 26%) 0%, transparent 72%), radial-gradient(40% 38% at 12% 72%, oklch(0.4 0.2 300 / 26%) 0%, transparent 72%)",
         }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20 opacity-[0.16]"
+        className="pointer-events-none absolute inset-0 -z-20 opacity-[0.12]"
         style={{
           backgroundImage:
             "linear-gradient(oklch(1 0 0 / 12%) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0 / 12%) 1px, transparent 1px)",
-          backgroundSize: "68px 68px",
-          maskImage: "radial-gradient(70% 55% at 50% 45%, #000 0%, transparent 100%)",
+          backgroundSize: "72px 72px",
+          maskImage: "radial-gradient(68% 54% at 50% 45%, #000 0%, transparent 100%)",
         }}
       />
+      {/* Bottom fade so the hero flows into the next section */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40"
+        style={{ background: "linear-gradient(to bottom, transparent, var(--background))" }}
+      />
+
       {!reduced &&
         PARTICLES.map((p, i) => (
           <motion.span
