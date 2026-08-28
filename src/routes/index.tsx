@@ -31,7 +31,7 @@ function Index() {
   const openVoice = () => setVoiceOpen(true);
 
   return (
-    <div className="relative min-h-svh bg-background">
+    <div className="relative min-h-svh overflow-x-clip bg-background">
       {/* Global atmosphere: very subtle grain over the whole surface */}
       <div
         aria-hidden="true"
