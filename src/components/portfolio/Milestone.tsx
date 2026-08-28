@@ -35,13 +35,17 @@ export function Milestone({
       <span
         aria-hidden="true"
         className={cn(
-          "absolute top-1.5 left-[0.6rem] grid h-5 w-5 place-items-center rounded-full border transition-all duration-400 sm:left-[1.1rem]",
+          "absolute top-1.5 left-[0.52rem] grid h-6 w-6 place-items-center rounded-full border transition-all duration-400 sm:left-[1.02rem]",
           active ? "scale-110" : "scale-100",
         )}
         style={{
           borderColor: accent,
           background: active ? accent : "var(--background)",
-          boxShadow: active ? `0 0 22px ${accent}` : "none",
+          boxShadow: active
+            ? `0 0 28px ${accent}`
+            : highlighted
+              ? `0 0 14px color-mix(in oklab, ${accent} 55%, transparent)`
+              : "none",
         }}
       >
         <span
@@ -49,6 +53,7 @@ export function Milestone({
           style={{ background: active ? "var(--background)" : accent }}
         />
       </span>
+
 
       <button
         type="button"
