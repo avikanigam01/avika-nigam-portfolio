@@ -50,18 +50,30 @@ export function AvatarExperience({
 
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
-      {/* Ambient spectrum glow */}
+      {/* Vivid gradient aura — concentrated colourful light behind the presence */}
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute rounded-full blur-[70px] sm:blur-[90px]",
-          size === "lg" ? "inset-[-18%]" : "inset-[-14%]",
+          "pointer-events-none absolute rounded-full blur-[60px] sm:blur-[80px]",
+          size === "lg" ? "inset-[-8%]" : "inset-[-10%]",
         )}
         style={{
           background:
             "conic-gradient(from 200deg, var(--pink), var(--magenta), var(--violet), var(--orange), var(--yellow), var(--pink))",
-          opacity: 0.42,
-          animation: reduced ? undefined : "drift-glow 16s ease-in-out infinite",
+          opacity: active ? 0.72 : 0.55,
+          animation: reduced ? undefined : "aura-breathe 14s ease-in-out infinite",
+        }}
+      />
+      {/* Inner concentrated light layer */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute rounded-full blur-[34px]",
+          size === "lg" ? "inset-[4%]" : "inset-[6%]",
+        )}
+        style={{
+          background: `radial-gradient(circle at 40% 30%, color-mix(in oklab, ${accent} 70%, transparent) 0%, transparent 68%)`,
+          opacity: 0.55,
         }}
       />
 
@@ -69,7 +81,7 @@ export function AvatarExperience({
         className={cn(
           "relative grid place-items-center rounded-full",
           size === "lg"
-            ? "h-[clamp(15rem,60vw,23rem)] w-[clamp(15rem,60vw,23rem)]"
+            ? "h-[clamp(15rem,62vw,24rem)] w-[clamp(15rem,62vw,24rem)]"
             : "h-52 w-52",
         )}
       >
@@ -92,15 +104,25 @@ export function AvatarExperience({
           </>
         ) : null}
 
-        {/* Rotating futuristic interface ring */}
+        {/* Thin orbital rings with travelling light points */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 rounded-full border border-dashed border-white/12"
+          className="absolute inset-[-6%] rounded-full border border-white/8"
+          style={{ animation: reduced ? undefined : "ring-spin 60s linear infinite" }}
+        >
+          <span
+            className="absolute top-0 left-1/2 block h-1.5 w-1.5 -translate-x-1/2 rounded-full"
+            style={{ background: "var(--yellow)", boxShadow: "0 0 14px var(--yellow)" }}
+          />
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full border border-dashed border-white/14"
           style={{ animation: reduced ? undefined : "ring-spin 44s linear infinite" }}
         >
           <span
-            className="absolute top-1/2 left-1/2 block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ transform: "translate(-50%, -50%) translateY(-50%)", background: accent }}
+            className="absolute top-0 left-1/2 block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: accent, boxShadow: `0 0 18px ${accent}` }}
           />
         </div>
         <div
@@ -114,18 +136,18 @@ export function AvatarExperience({
 
         {/* Avatar placeholder core — deliberately no generated face */}
         <div
-          className="relative grid h-[82%] w-[82%] place-items-center overflow-hidden rounded-full border border-white/10"
+          className="grain relative grid h-[80%] w-[80%] place-items-center overflow-hidden rounded-full border border-white/12"
           style={{
             background:
-              "radial-gradient(120% 120% at 30% 20%, oklch(0.26 0.05 320) 0%, oklch(0.15 0.02 300) 55%, oklch(0.12 0.01 300) 100%)",
-            boxShadow: `inset 0 0 90px -20px ${accent}`,
+              "radial-gradient(120% 120% at 30% 18%, oklch(0.22 0.06 322) 0%, oklch(0.11 0.015 300) 58%, oklch(0.075 0.006 300) 100%)",
+            boxShadow: `inset 0 0 110px -18px ${accent}, 0 30px 80px -40px ${accent}`,
           }}
           role="img"
           aria-label={`Placeholder for Avika's interactive AI avatar. Current state: ${copy.label}`}
         >
           <div className="flex flex-col items-center gap-3 px-6 text-center">
             <span
-              className="grid h-12 w-12 place-items-center rounded-full border border-white/12 bg-white/5"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/14 bg-white/5"
               aria-hidden="true"
             >
               {state === "error" ? (
@@ -139,24 +161,18 @@ export function AvatarExperience({
               )}
             </span>
             <span
-              className="font-display text-4xl tracking-tight sm:text-5xl"
-              style={{
-                background: "var(--gradient-spectrum)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
+              className="text-spectrum font-display text-5xl leading-none font-semibold tracking-[0.06em] sm:text-6xl"
               aria-hidden="true"
             >
               AN
             </span>
-            <p className="font-display text-[0.62rem] tracking-[0.3em] text-muted-foreground uppercase">
-              Avatar placeholder
+            <p className="font-display text-[0.58rem] tracking-[0.34em] text-muted-foreground/80 uppercase">
+              Digital presence
             </p>
           </div>
 
           {/* State visual: waveform or processing dots */}
-          <div className="absolute bottom-[14%] flex h-8 items-end justify-center gap-[3px]">
+          <div className="absolute bottom-[13%] flex h-8 items-end justify-center gap-[3px]">
             {state === "thinking" ? (
               <ThinkingDots accent={accent} reduced={!!reduced} />
             ) : active ? (
@@ -164,7 +180,20 @@ export function AvatarExperience({
             ) : null}
           </div>
         </div>
+
+        {/* Editorial orbit labels */}
+        {size === "lg" ? (
+          <>
+            <span
+              aria-hidden="true"
+              className="absolute -bottom-3 left-1/2 -translate-x-1/2 font-display text-[0.55rem] tracking-[0.42em] text-white/40 uppercase"
+            >
+              AI • Voice • Interactive
+            </span>
+          </>
+        ) : null}
       </div>
+
 
       {/* Live status readout */}
       <div className="mt-7 flex flex-col items-center gap-2 text-center" aria-live="polite">

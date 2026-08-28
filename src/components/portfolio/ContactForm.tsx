@@ -140,11 +140,18 @@ export function ContactForm() {
           ) : null}
         </div>
 
-        {/* Honeypot — hidden from humans and assistive tech */}
+        {/* Honeypot — hidden from humans and assistive tech, never submitted */}
         <div aria-hidden="true" className="absolute h-0 w-0 overflow-hidden opacity-0">
-          <label htmlFor="contact-company">Company</label>
-          <input id="contact-company" ref={honeypot} type="text" tabIndex={-1} autoComplete="off" />
+          <label htmlFor="contact-nickname">Nickname</label>
+          <input
+            id="contact-nickname"
+            ref={honeypot}
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
         </div>
+
 
         {errors.form ? (
           <p role="alert" className="text-sm text-destructive">

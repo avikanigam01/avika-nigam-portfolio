@@ -22,26 +22,34 @@ export function Journey() {
       >
         <Reveal>
           <div className="relative">
-            {/* Flowing spine */}
+            {/* Flowing growth path */}
             <span
               aria-hidden="true"
-              className="absolute top-2 bottom-6 left-[1.3rem] w-px sm:left-[1.8rem]"
+              className="absolute top-2 bottom-6 left-[1.28rem] w-[3px] rounded-full sm:left-[1.78rem]"
               style={{
-                background:
-                  "linear-gradient(180deg, transparent, var(--violet), var(--magenta), var(--orange), var(--yellow), transparent)",
-                opacity: 0.55,
+                background: "var(--gradient-path)",
+                opacity: 0.85,
+                filter: "blur(0.2px)",
               }}
             />
+            <span
+              aria-hidden="true"
+              className="absolute top-2 bottom-6 left-[1.28rem] w-[3px] rounded-full blur-[7px] sm:left-[1.78rem]"
+              style={{ background: "var(--gradient-path)", opacity: 0.6 }}
+            />
+
             <ol className="relative">
               {milestones.map((milestone, i) => (
                 <Milestone
                   key={milestone.id}
                   milestone={milestone}
                   index={i}
+                  total={milestones.length}
                   active={activeId === milestone.id}
                   onActivate={() => setActiveId(milestone.id)}
                 />
               ))}
+
             </ol>
           </div>
         </Reveal>

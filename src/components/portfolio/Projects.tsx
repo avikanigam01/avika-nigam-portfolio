@@ -21,13 +21,21 @@ export function Projects() {
         }
         lead="Prototypes and works in progress, described as they actually are — problem first, then what I built and what it taught me."
       >
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {projects.map((project, i) => (
-            <Reveal key={project.id} delay={i * 0.07}>
-              <ProjectCard project={project} onOpen={() => setActive(project)} />
+        <div className="flex flex-col gap-5">
+          {projects.slice(0, 1).map((project) => (
+            <Reveal key={project.id}>
+              <ProjectCard project={project} featured onOpen={() => setActive(project)} />
             </Reveal>
           ))}
+          <div className="grid gap-5 md:grid-cols-2">
+            {projects.slice(1).map((project, i) => (
+              <Reveal key={project.id} delay={i * 0.07}>
+                <ProjectCard project={project} onOpen={() => setActive(project)} />
+              </Reveal>
+            ))}
+          </div>
         </div>
+
       </SectionShell>
 
       <ProjectDetail project={active} onOpenChange={(open) => !open && setActive(null)} />

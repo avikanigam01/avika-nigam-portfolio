@@ -76,51 +76,51 @@
 .dark {
   --radius: 0.875rem;
 
-  /* Near-black base */
-  --background: oklch(0.13 0.008 300);
-  --foreground: oklch(0.97 0.005 300);
-  --surface: oklch(0.17 0.012 300);
-  --surface-2: oklch(0.21 0.016 300);
+  /* Near-black base (#050505-ish) */
+  --background: oklch(0.09 0.006 300);
+  --foreground: oklch(0.98 0.004 300);
+  --surface: oklch(0.135 0.01 300);
+  --surface-2: oklch(0.175 0.014 300);
   --hairline: oklch(1 0 0 / 9%);
 
-  --card: oklch(0.17 0.012 300);
-  --card-foreground: oklch(0.97 0.005 300);
-  --popover: oklch(0.17 0.012 300);
-  --popover-foreground: oklch(0.97 0.005 300);
+  --card: oklch(0.135 0.01 300);
+  --card-foreground: oklch(0.98 0.004 300);
+  --popover: oklch(0.135 0.01 300);
+  --popover-foreground: oklch(0.98 0.004 300);
 
-  /* Accent spectrum — ambient use only */
-  --pink: oklch(0.72 0.21 350);
-  --magenta: oklch(0.62 0.26 328);
-  --violet: oklch(0.6 0.24 300);
-  --orange: oklch(0.76 0.18 55);
-  --yellow: oklch(0.87 0.16 92);
+  /* Accent spectrum — vivid, concentrated light out of darkness */
+  --pink: oklch(0.72 0.29 355);
+  --magenta: oklch(0.66 0.32 328);
+  --violet: oklch(0.62 0.3 302);
+  --orange: oklch(0.77 0.22 52);
+  --yellow: oklch(0.89 0.19 96);
 
-  --primary: oklch(0.72 0.21 350);
-  --primary-foreground: oklch(0.14 0.01 300);
-  --secondary: oklch(0.21 0.016 300);
-  --secondary-foreground: oklch(0.97 0.005 300);
-  --muted: oklch(0.21 0.016 300);
-  --muted-foreground: oklch(0.73 0.015 300);
-  --accent: oklch(0.24 0.03 320);
-  --accent-foreground: oklch(0.97 0.005 300);
-  --destructive: oklch(0.65 0.22 25);
+  --primary: oklch(0.72 0.29 355);
+  --primary-foreground: oklch(0.1 0.008 300);
+  --secondary: oklch(0.175 0.014 300);
+  --secondary-foreground: oklch(0.98 0.004 300);
+  --muted: oklch(0.175 0.014 300);
+  --muted-foreground: oklch(0.75 0.015 300);
+  --accent: oklch(0.22 0.04 322);
+  --accent-foreground: oklch(0.98 0.004 300);
+  --destructive: oklch(0.66 0.24 25);
   --destructive-foreground: oklch(0.98 0.005 300);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.72 0.21 350);
-  --chart-1: oklch(0.72 0.21 350);
-  --chart-2: oklch(0.62 0.26 328);
-  --chart-3: oklch(0.6 0.24 300);
-  --chart-4: oklch(0.76 0.18 55);
-  --chart-5: oklch(0.87 0.16 92);
-  --sidebar: oklch(0.17 0.012 300);
-  --sidebar-foreground: oklch(0.97 0.005 300);
-  --sidebar-primary: oklch(0.72 0.21 350);
-  --sidebar-primary-foreground: oklch(0.14 0.01 300);
-  --sidebar-accent: oklch(0.21 0.016 300);
-  --sidebar-accent-foreground: oklch(0.97 0.005 300);
+  --ring: oklch(0.72 0.29 355);
+  --chart-1: oklch(0.72 0.29 355);
+  --chart-2: oklch(0.66 0.32 328);
+  --chart-3: oklch(0.62 0.3 302);
+  --chart-4: oklch(0.77 0.22 52);
+  --chart-5: oklch(0.89 0.19 96);
+  --sidebar: oklch(0.135 0.01 300);
+  --sidebar-foreground: oklch(0.98 0.004 300);
+  --sidebar-primary: oklch(0.72 0.29 355);
+  --sidebar-primary-foreground: oklch(0.1 0.008 300);
+  --sidebar-accent: oklch(0.175 0.014 300);
+  --sidebar-accent-foreground: oklch(0.98 0.004 300);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.21 350);
+  --sidebar-ring: oklch(0.72 0.29 355);
 
   --gradient-spectrum: linear-gradient(
     100deg,
@@ -131,8 +131,19 @@
     var(--yellow)
   );
   --gradient-warm: linear-gradient(120deg, var(--pink), var(--orange), var(--yellow));
-  --shadow-lift: 0 24px 60px -28px oklch(0.62 0.26 328 / 45%);
+  --gradient-cool: linear-gradient(130deg, var(--pink), var(--magenta), var(--violet));
+  --gradient-path: linear-gradient(
+    180deg,
+    var(--pink),
+    var(--magenta),
+    var(--violet),
+    var(--orange),
+    var(--yellow)
+  );
+  --shadow-lift: 0 26px 70px -30px oklch(0.66 0.32 328 / 60%);
+  --shadow-glow: 0 0 44px -8px oklch(0.72 0.29 355 / 55%);
 }
+
 
 @layer base {
   * {
@@ -187,6 +198,32 @@
   border: 1px solid transparent;
 }
 
+/* Very subtle film grain overlay for atmospheric depth. Decorative. */
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Vivid gradient-bordered surface used for the signature TALK TO ME action. */
+@utility gradient-ring {
+  background:
+    linear-gradient(oklch(0.11 0.008 300), oklch(0.11 0.008 300)) padding-box,
+    var(--gradient-spectrum) border-box;
+  background-size:
+    auto,
+    220% 100%;
+  border: 1.5px solid transparent;
+  animation: spectrum-pan 12s ease-in-out infinite;
+}
+
+
 @keyframes spectrum-pan {
   0%,
   100% {
@@ -239,3 +276,25 @@
   }
 }
 
+
+@keyframes aura-breathe {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.07) rotate(8deg);
+    opacity: 0.9;
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
