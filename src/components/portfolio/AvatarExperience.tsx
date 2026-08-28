@@ -55,12 +55,12 @@ export function AvatarExperience({
         aria-hidden="true"
         className={cn(
           "pointer-events-none absolute rounded-full blur-[60px] sm:blur-[80px]",
-          size === "lg" ? "inset-[-22%]" : "inset-[-16%]",
+          size === "lg" ? "inset-[-8%]" : "inset-[-10%]",
         )}
         style={{
           background:
             "conic-gradient(from 200deg, var(--pink), var(--magenta), var(--violet), var(--orange), var(--yellow), var(--pink))",
-          opacity: active ? 0.78 : 0.62,
+          opacity: active ? 0.72 : 0.55,
           animation: reduced ? undefined : "aura-breathe 14s ease-in-out infinite",
         }}
       />
@@ -184,12 +184,6 @@ export function AvatarExperience({
         {/* Editorial orbit labels */}
         {size === "lg" ? (
           <>
-            <span
-              aria-hidden="true"
-              className="absolute -top-3 left-1/2 -translate-x-1/2 font-display text-[0.55rem] tracking-[0.42em] text-white/40 uppercase"
-            >
-              Digital presence
-            </span>
             <span
               aria-hidden="true"
               className="absolute -bottom-3 left-1/2 -translate-x-1/2 font-display text-[0.55rem] tracking-[0.42em] text-white/40 uppercase"
