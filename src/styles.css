@@ -198,6 +198,32 @@
   border: 1px solid transparent;
 }
 
+/* Very subtle film grain overlay for atmospheric depth. Decorative. */
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Vivid gradient-bordered surface used for the signature TALK TO ME action. */
+@utility gradient-ring {
+  background:
+    linear-gradient(oklch(0.11 0.008 300), oklch(0.11 0.008 300)) padding-box,
+    var(--gradient-spectrum) border-box;
+  background-size:
+    auto,
+    220% 100%;
+  border: 1.5px solid transparent;
+  animation: spectrum-pan 12s ease-in-out infinite;
+}
+
+
 @keyframes spectrum-pan {
   0%,
   100% {
