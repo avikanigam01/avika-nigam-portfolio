@@ -1,24 +1,33 @@
 import { cn } from "@/lib/utils";
 import type { Milestone as MilestoneData } from "@/data/portfolioData";
 
-const STATE_ACCENT: Record<MilestoneData["state"], string> = {
-  past: "var(--violet)",
-  current: "var(--orange)",
-  future: "var(--yellow)",
-};
+/** Path colours progress pink -> magenta -> violet -> orange -> yellow along the journey. */
+const PATH_SPECTRUM = [
+  "var(--pink)",
+  "var(--magenta)",
+  "var(--violet)",
+  "var(--orange)",
+  "var(--yellow)",
+];
 
 export function Milestone({
   milestone,
   index,
+  total,
   active,
   onActivate,
 }: {
   milestone: MilestoneData;
   index: number;
+  total?: number;
   active: boolean;
   onActivate: () => void;
 }) {
-  const accent = STATE_ACCENT[milestone.state];
+  const steps = Math.max((total ?? PATH_SPECTRUM.length) - 1, 1);
+  const position = Math.round((index / steps) * (PATH_SPECTRUM.length - 1));
+  const accent = PATH_SPECTRUM[Math.min(position, PATH_SPECTRUM.length - 1)]!;
+  const highlighted = milestone.state === "current" || !!milestone.tag;
+
 
   return (
     <li className="relative pl-12 sm:pl-16">
