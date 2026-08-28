@@ -62,33 +62,48 @@ export function Navbar({ onTalk }: { onTalk: () => void }) {
         </a>
 
         <ul className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <li key={link.id}>
-              <a
-                href={`#${link.id}`}
-                className="relative rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.id;
+            return (
+              <li key={link.id}>
+                <a
+                  href={`#${link.id}`}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "relative rounded-full px-4 py-2 text-sm transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {link.label}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute inset-x-4 -bottom-0.5 h-px origin-center rounded-full transition-transform duration-500",
+                      isActive ? "scale-x-100" : "scale-x-0",
+                    )}
+                    style={{ background: "var(--gradient-cool)" }}
+                  />
+                </a>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onTalk}
-            className="group relative hidden items-center gap-2 overflow-hidden rounded-full border border-pink/50 px-5 py-2.5 font-display text-xs font-semibold tracking-[0.16em] uppercase transition-all hover:border-pink md:inline-flex"
-            style={{ boxShadow: "0 0 0 0 transparent" }}
+            className="gradient-ring group relative hidden items-center gap-2 overflow-hidden rounded-full px-5 py-2.5 font-display text-xs font-semibold tracking-[0.16em] uppercase transition-all hover:-translate-y-px md:inline-flex"
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 -z-10 opacity-25 transition-opacity duration-500 group-hover:opacity-60"
-              style={{ background: "var(--gradient-warm)" }}
+              className="absolute inset-0 -z-10 opacity-20 transition-opacity duration-500 group-hover:opacity-55"
+              style={{ background: "var(--gradient-cool)" }}
             />
-            <Mic className="h-3.5 w-3.5" aria-hidden="true" />
+            <Mic className="h-3.5 w-3.5 text-pink" aria-hidden="true" />
             Talk to me
           </button>
+
 
           <button
             type="button"
