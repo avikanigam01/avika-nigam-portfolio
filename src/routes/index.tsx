@@ -31,7 +31,13 @@ function Index() {
   const openVoice = () => setVoiceOpen(true);
 
   return (
-    <div className="min-h-svh bg-background">
+    <div className="relative min-h-svh bg-background">
+      {/* Global atmosphere: very subtle grain over the whole surface */}
+      <div
+        aria-hidden="true"
+        className="grain pointer-events-none fixed inset-0 z-0 opacity-70"
+      />
+
       <a
         href="#about"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-foreground focus:px-4 focus:py-2 focus:text-sm focus:text-background"
