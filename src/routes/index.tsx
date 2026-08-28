@@ -47,7 +47,7 @@ function Index() {
 
       <Navbar onTalk={openVoice} />
 
-      <main>
+      <main className="relative z-10">
         <Hero onTalk={openVoice} />
         <About />
         <Skills />
@@ -57,7 +57,10 @@ function Index() {
         <Contact onTalk={openVoice} />
       </main>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
+
       <VoiceInteraction open={voiceOpen} onOpenChange={setVoiceOpen} />
     </div>
   );
