@@ -140,11 +140,16 @@ export function ContactForm() {
           ) : null}
         </div>
 
-        {/* Honeypot — hidden from humans and assistive tech, never submitted */}
-        <div aria-hidden="true" className="absolute h-0 w-0 overflow-hidden opacity-0">
-          <label htmlFor="contact-nickname">Nickname</label>
+        {/* Honeypot — never rendered visibly, never shown to assistive tech, never submitted */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+          style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+        >
           <input
             id="contact-nickname"
+            name="nickname"
+            aria-hidden="true"
             ref={honeypot}
             type="text"
             tabIndex={-1}
