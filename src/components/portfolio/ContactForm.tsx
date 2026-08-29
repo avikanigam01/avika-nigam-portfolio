@@ -154,7 +154,7 @@ export function ContactForm() {
             type="text"
             tabIndex={-1}
             autoComplete="off"
-􀀀          />
+          />
         </div>
 
 
