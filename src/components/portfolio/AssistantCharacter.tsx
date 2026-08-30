@@ -114,7 +114,7 @@ export function AssistantCharacter({
                 rx={4}
                 ry={4.6}
                 fill="oklch(1 0 0 / 88%)"
-                style={{ animation: anim(state === "thinking" ? "eye-search 2.4s ease-in-out infinite" : undefined ?? "") }}
+                style={{ animation: state === "thinking" ? anim("eye-search 2.4s ease-in-out infinite") : undefined }}
               />
             </g>
           ))}
