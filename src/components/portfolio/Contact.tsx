@@ -27,14 +27,14 @@ export function Contact({ onTalk }: { onTalk: () => void }) {
               <ContactLink
                 href={contact.links.linkedin.url}
                 label={contact.links.linkedin.label}
-                detail={contact.links.linkedin.placeholder}
+                detail="www.linkedin.com/in/avika-nigam-1b443a381"
                 icon={<Linkedin className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--violet)"
               />
               <ContactLink
                 href={contact.links.email.url}
                 label={contact.links.email.label}
-                detail={contact.links.email.placeholder}
+                detail="mailto:avikanigam01@gmail.com">"
                 icon={<Mail className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--orange)"
               />
