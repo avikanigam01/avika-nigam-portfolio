@@ -1,3 +1,4 @@
+import { AssistantCharacter } from "./AssistantCharacter";
 import { motion, useReducedMotion } from "motion/react";
 import { Mic, MicOff, Sparkles, AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
