@@ -298,3 +298,50 @@
     transform: translateY(-8px);
   }
 }
+
+/* ---- Avika's AI assistant character ---- */
+@keyframes bot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes bot-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.015); }
+}
+@keyframes bot-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+@keyframes bot-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+@keyframes flame-flicker {
+  0%, 100% { transform: scaleY(1) scaleX(1) rotate(0deg); }
+  35% { transform: scaleY(1.09) scaleX(0.95) rotate(-2deg); }
+  70% { transform: scaleY(0.95) scaleX(1.04) rotate(2deg); }
+}
+@keyframes mouth-talk {
+  0%, 100% { transform: scaleY(0.45) scaleX(1.05); }
+  50% { transform: scaleY(1.2) scaleX(0.92); }
+}
+@keyframes eye-search {
+  0%, 100% { transform: translate(-3px, -4px); }
+  50% { transform: translate(4px, -2px); }
+}
+@keyframes think-pop {
+  0%, 100% { opacity: 0.15; transform: translateY(2px); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+@keyframes listen-ripple {
+  0% { opacity: 0.55; transform: scale(0.85); transform-origin: 100px 110px; }
+  100% { opacity: 0; transform: scale(1.15); transform-origin: 100px 110px; }
+}
+@keyframes arm-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}

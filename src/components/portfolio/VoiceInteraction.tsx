@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Mic, Square, RotateCcw, Info } from "lucide-react";
+import { Info, RotateCcw, Send, Mic } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,17 +8,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AvatarExperience, type AvatarState } from "./AvatarExperience";
+import { Input } from "@/components/ui/input";
+import { AssistantCharacter, type AssistantState } from "./AssistantCharacter";
 import { profile } from "@/data/portfolioData";
+import {
+  ASSISTANT_GREETING,
+  ASSISTANT_SUGGESTIONS,
+  answerQuestion,
+} from "@/lib/assistantKnowledge";
+
+type Turn = { id: number; role: "you" | "assistant"; text: string };
+
+const STATE_LABEL: Record<AssistantState, string> = {
+  idle: "Ready",
+  listening: "Listening...",
+  thinking: "Thinking...",
+  speaking: "Speaking...",
+  error: "Something went wrong",
+};
 
 /**
- * Front-end only simulation of the voice experience.
- *
- * FUTURE INTEGRATION (architecture only — nothing below calls an AI service):
- *   visitor speech -> speech-to-text -> LLM -> portfolio knowledge
- *                  -> response -> text-to-speech -> real-time avatar -> visitor
- * Any future API keys stay server-side (Supabase Edge Function / env vars),
- * never in this component.
+ * Avika's AI Assistant — Stage 1: character + all states + working text chat
+ * grounded in the centralized portfolio data. Voice (SpeechRecognition /
+ * SpeechSynthesis) and the server-side model call arrive in later stages;
+ * this component is the stable UI contract for both.
  */
 export function VoiceInteraction({
   open,
@@ -27,136 +40,203 @@ export function VoiceInteraction({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const [state, setState] = useState<AvatarState>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [state, setState] = useState<AssistantState>("idle");
+  const [turns, setTurns] = useState<Turn[]>([
+    { id: 0, role: "assistant", text: ASSISTANT_GREETING },
+  ]);
+  const [draft, setDraft] = useState("");
+  const [notice, setNotice] = useState<string | null>(null);
+  const lastQuestion = useRef<string>("");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
+  const scroller = useRef<HTMLDivElement | null>(null);
+  const nextId = useRef(1);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
   }, []);
 
-  const stopStream = useCallback(() => {
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-  }, []);
-
-  const reset = useCallback(() => {
-    clearTimers();
-    stopStream();
-    setState("idle");
-    setErrorMessage(null);
-  }, [clearTimers, stopStream]);
+  useEffect(() => () => clearTimers(), [clearTimers]);
 
   useEffect(() => {
-    if (!open) reset();
-    return () => {
+    if (!open) {
       clearTimers();
-      stopStream();
-    };
-  }, [open, reset, clearTimers, stopStream]);
-
-  const runPreview = useCallback(async () => {
-    clearTimers();
-    setErrorMessage(null);
-
-    // Mic permission is requested only so the preview states feel truthful.
-    // Nothing is recorded, stored, or sent anywhere.
-    try {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("unsupported");
-      }
-      streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (error) {
-      setState("error");
-      setErrorMessage(
-        error instanceof Error && error.message === "unsupported"
-          ? "This browser doesn't support microphone access. You can still explore the portfolio below."
-          : "Microphone access was blocked. Enable it in your browser settings, or just keep scrolling — everything else works without it.",
-      );
-      return;
+      setState("idle");
+      setNotice(null);
     }
+  }, [open, clearTimers]);
 
+  useEffect(() => {
+    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
+  }, [turns, state]);
+
+  const ask = useCallback(
+    (question: string) => {
+      const q = question.trim().slice(0, 400);
+      if (!q) return;
+      clearTimers();
+      setNotice(null);
+      lastQuestion.current = q;
+      setDraft("");
+      setTurns((prev) => [...prev, { id: nextId.current++, role: "you", text: q }]);
+      setState("thinking");
+
+      timers.current.push(
+        setTimeout(() => {
+          const reply = answerQuestion(q);
+          setTurns((prev) => [...prev, { id: nextId.current++, role: "assistant", text: reply }]);
+          setState("speaking");
+          timers.current.push(setTimeout(() => setState("idle"), 1600));
+        }, 900),
+      );
+    },
+    [clearTimers],
+  );
+
+  const startVoice = useCallback(() => {
     setState("listening");
-    timers.current.push(
-      setTimeout(() => setState("thinking"), 2600),
-      setTimeout(() => setState("speaking"), 4200),
-      setTimeout(() => {
-        stopStream();
-        setState("idle");
-      }, 8200),
+    setNotice(
+      "Live voice input is coming in the next stage of this assistant. You can type your question below — it works fully.",
     );
-  }, [clearTimers, stopStream]);
-
-  const stop = useCallback(() => {
     clearTimers();
-    stopStream();
-    setState("idle");
-  }, [clearTimers, stopStream]);
+    timers.current.push(setTimeout(() => setState("idle"), 2400));
+  }, [clearTimers]);
 
-  const busy = state === "listening" || state === "thinking" || state === "speaking";
+  const busy = state === "thinking" || state === "speaking";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg overflow-hidden border-white/10 bg-background/95 backdrop-blur-xl sm:max-w-xl">
-
+      <DialogContent className="max-w-lg overflow-hidden border-white/10 bg-background/95 backdrop-blur-xl sm:max-w-2xl">
         <DialogHeader className="text-left">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow/40 px-2.5 py-1 font-display text-[0.62rem] tracking-[0.2em] text-yellow uppercase">
               <Info className="h-3 w-3" aria-hidden="true" />
               Preview mode
             </span>
+            <span className="font-display text-[0.62rem] tracking-[0.2em] text-muted-foreground uppercase">
+              {STATE_LABEL[state]}
+            </span>
           </div>
           <DialogTitle className="mt-3 font-display text-2xl tracking-tight">
-            Talk to {profile.shortName}
+            {profile.shortName}&apos;s AI Assistant
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Real-time voice conversation with an AI representation of Avika is planned, not live
-            yet. This is a visual preview of how it will feel.
+            Ask about Avika&apos;s projects, skills, journey or goals. Answers come only from this
+            portfolio&apos;s own content — spoken voice is not live yet.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col items-center py-2">
-          <AvatarExperience state={state} size="sm" />
-        </div>
+        <div className="grid gap-4 sm:grid-cols-[9.5rem_1fr] sm:items-start">
+          <AssistantCharacter state={state} className="mx-auto w-32 sm:w-full" />
 
-        {state === "error" && errorMessage ? (
-          <p
-            role="alert"
-            className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-foreground"
-          >
-            {errorMessage}
-          </p>
-        ) : null}
+          <div className="flex min-w-0 flex-col gap-3">
+            <div
+              ref={scroller}
+              className="max-h-56 min-h-32 space-y-3 overflow-y-auto pr-1 text-sm"
+              aria-live="polite"
+            >
+              {turns.map((t) => (
+                <p key={t.id} className="leading-relaxed">
+                  <span
+                    className={
+                      t.role === "you"
+                        ? "font-display text-[0.62rem] tracking-[0.2em] text-muted-foreground uppercase"
+                        : "font-display text-[0.62rem] tracking-[0.2em] text-pink uppercase"
+                    }
+                  >
+                    {t.role === "you" ? "You" : "Avika's Assistant"}
+                  </span>
+                  <br />
+                  <span className={t.role === "you" ? "text-muted-foreground" : "text-foreground"}>
+                    {t.text}
+                  </span>
+                </p>
+              ))}
+              {state === "thinking" ? (
+                <p className="font-display text-[0.62rem] tracking-[0.2em] text-yellow uppercase">
+                  Thinking...
+                </p>
+              ) : null}
+            </div>
 
-        <div className="flex flex-wrap justify-center gap-3 pt-1">
-          {busy ? (
-            <Button onClick={stop} variant="secondary" className="rounded-full">
-              <Square className="h-4 w-4" aria-hidden="true" />
-              Stop preview
-            </Button>
-          ) : (
-            <Button onClick={runPreview} className="rounded-full">
-              {state === "error" ? (
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              ) : (
+            <div className="flex flex-wrap gap-2">
+              {ASSISTANT_SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => ask(s)}
+                  disabled={busy}
+                  className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-pink/50 hover:text-foreground disabled:opacity-50"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                ask(draft);
+              }}
+              className="flex items-center gap-2"
+            >
+              <label htmlFor="assistant-question" className="sr-only">
+                Type your question for Avika&apos;s assistant
+              </label>
+              <Input
+                id="assistant-question"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Type your question..."
+                maxLength={400}
+                className="rounded-full border-white/12 bg-white/[0.03]"
+              />
+              <Button
+                type="submit"
+                size="icon"
+                className="shrink-0 rounded-full"
+                disabled={busy || !draft.trim()}
+                aria-label="Ask Avika's assistant"
+              >
+                <Send className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </form>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full"
+                onClick={startVoice}
+                aria-label="Start voice conversation"
+              >
                 <Mic className="h-4 w-4" aria-hidden="true" />
-              )}
-              {state === "error" ? "Try again" : "Run voice preview"}
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            className="rounded-full text-muted-foreground"
-            onClick={() => onOpenChange(false)}
-          >
-            Close
-          </Button>
+                Talk
+              </Button>
+              {lastQuestion.current ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="rounded-full text-muted-foreground"
+                  onClick={() => ask(lastQuestion.current)}
+                  disabled={busy}
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                  Retry
+                </Button>
+              ) : null}
+            </div>
+
+            {notice ? (
+              <p role="status" className="text-xs text-muted-foreground">
+                {notice}
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          Nothing is recorded or sent anywhere. {profile.avatarHelper}
+          Preview experience — voice is not live yet. {profile.avatarHelper}
         </p>
       </DialogContent>
     </Dialog>

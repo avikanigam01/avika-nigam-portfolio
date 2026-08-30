@@ -145,31 +145,17 @@ export function AvatarExperience({
           role="img"
           aria-label={`Placeholder for Avika's interactive AI avatar. Current state: ${copy.label}`}
         >
-          <div className="flex flex-col items-center gap-3 px-6 text-center">
-            <span
-              className="grid h-11 w-11 place-items-center rounded-full border border-white/14 bg-white/5"
-              aria-hidden="true"
-            >
-              {state === "error" ? (
-                <MicOff className="h-5 w-5" style={{ color: accent }} />
-              ) : state === "thinking" ? (
-                <Sparkles className="h-5 w-5" style={{ color: accent }} />
-              ) : state === "speaking" ? (
-                <AudioLines className="h-5 w-5" style={{ color: accent }} />
-              ) : (
-                <Mic className="h-5 w-5" style={{ color: accent }} />
-              )}
-            </span>
-            <span
-              className="text-spectrum font-display text-5xl leading-none font-semibold tracking-[0.06em] sm:text-6xl"
-              aria-hidden="true"
-            >
-              AN
-            </span>
+          <div className="flex flex-col items-center gap-2 px-4 text-center">
+            <AssistantCharacter
+              state={state === "error" ? "error" : state}
+              accent={accent}
+              className="w-[74%]"
+            />
             <p className="font-display text-[0.58rem] tracking-[0.34em] text-muted-foreground/80 uppercase">
               Digital presence
             </p>
           </div>
+
 
           {/* State visual: waveform or processing dots */}
           <div className="absolute bottom-[13%] flex h-8 items-end justify-center gap-[3px]">
