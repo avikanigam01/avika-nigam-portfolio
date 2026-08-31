@@ -55,13 +55,13 @@ export function AvatarExperience({
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute rounded-full blur-[60px] sm:blur-[80px]",
+          "pointer-events-none absolute rounded-full blur-[52px] sm:blur-[80px]",
           size === "lg" ? "inset-[-8%]" : "inset-[-10%]",
         )}
         style={{
           background:
             "conic-gradient(from 200deg, var(--pink), var(--magenta), var(--violet), var(--orange), var(--yellow), var(--pink))",
-          opacity: active ? 0.72 : 0.55,
+          opacity: active ? 0.9 : 0.72,
           animation: reduced ? undefined : "aura-breathe 14s ease-in-out infinite",
         }}
       />
@@ -69,12 +69,12 @@ export function AvatarExperience({
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute rounded-full blur-[34px]",
+          "pointer-events-none absolute rounded-full blur-[30px]",
           size === "lg" ? "inset-[4%]" : "inset-[6%]",
         )}
         style={{
-          background: `radial-gradient(circle at 40% 30%, color-mix(in oklab, ${accent} 70%, transparent) 0%, transparent 68%)`,
-          opacity: 0.55,
+          background: `radial-gradient(circle at 42% 32%, color-mix(in oklab, ${accent} 88%, transparent) 0%, transparent 66%)`,
+          opacity: 0.72,
         }}
       />
 
@@ -108,32 +108,33 @@ export function AvatarExperience({
         {/* Thin orbital rings with travelling light points */}
         <div
           aria-hidden="true"
-          className="absolute inset-[-6%] rounded-full border border-white/8"
+          className="absolute inset-[-6%] rounded-full border border-white/5"
           style={{ animation: reduced ? undefined : "ring-spin 60s linear infinite" }}
         >
           <span
-            className="absolute top-0 left-1/2 block h-1.5 w-1.5 -translate-x-1/2 rounded-full"
-            style={{ background: "var(--yellow)", boxShadow: "0 0 14px var(--yellow)" }}
+            className="absolute top-0 left-1/2 block h-1 w-1 -translate-x-1/2 rounded-full"
+            style={{ background: "var(--yellow)", boxShadow: "0 0 10px var(--yellow)" }}
           />
         </div>
         <div
           aria-hidden="true"
-          className="absolute inset-0 rounded-full border border-dashed border-white/14"
+          className="absolute inset-0 rounded-full border border-dashed border-white/8"
           style={{ animation: reduced ? undefined : "ring-spin 44s linear infinite" }}
         >
           <span
-            className="absolute top-0 left-1/2 block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ background: accent, boxShadow: `0 0 18px ${accent}` }}
+            className="absolute top-0 left-1/2 block h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
           />
         </div>
         <div
           aria-hidden="true"
-          className="absolute inset-[7%] rounded-full border border-white/8"
+          className="absolute inset-[7%] rounded-full border border-white/5"
           style={{
             animation: reduced ? undefined : "ring-spin 70s linear infinite reverse",
             maskImage: "linear-gradient(200deg, #000 30%, transparent 70%)",
           }}
         />
+
 
         {/* Avatar placeholder core — deliberately no generated face */}
         <div
