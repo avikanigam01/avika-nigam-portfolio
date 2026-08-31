@@ -7,7 +7,11 @@ import { contact, profile } from "@/data/portfolioData";
 export function Contact({ onTalk }: { onTalk: () => void }) {
   return (
     <div className="relative">
-      <AmbientGlow className="-top-10 left-1/4 h-96 w-96 opacity-30" color="var(--magenta)" />
+      <AmbientGlow
+        className="-top-10 left-1/4 h-96 w-96 opacity-30"
+        color="var(--magenta)"
+      />
+
       <SectionShell
         id="contact"
         eyebrow="Contact"
@@ -24,6 +28,7 @@ export function Contact({ onTalk }: { onTalk: () => void }) {
                 icon={<Github className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--pink)"
               />
+
               <ContactLink
                 href={contact.links.linkedin.url}
                 label={contact.links.linkedin.label}
@@ -31,12 +36,14 @@ export function Contact({ onTalk }: { onTalk: () => void }) {
                 icon={<Linkedin className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--violet)"
               />
+
               <ContactLink
                 href={contact.links.email.url}
                 label={contact.links.email.label}
                 detail="avikanigam01@gmail.com"
                 icon={<Mail className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--orange)"
+                isEmail
               />
 
               <button
@@ -48,10 +55,12 @@ export function Contact({ onTalk }: { onTalk: () => void }) {
                   <span className="block font-display text-base font-semibold tracking-tight">
                     Prefer talking?
                   </span>
+
                   <span className="mt-1 block text-sm text-muted-foreground">
                     {profile.avatarHelper}
                   </span>
                 </span>
+
                 <span
                   className="grid h-11 w-11 shrink-0 place-items-center rounded-full"
                   style={{ background: "var(--gradient-warm)" }}
@@ -78,12 +87,14 @@ function ContactLink({
   detail,
   icon,
   accent,
+  isEmail = false,
 }: {
   href: string | null;
   label: string;
   detail: string;
   icon: React.ReactNode;
   accent: string;
+  isEmail?: boolean;
 }) {
   const inner = (
     <>
@@ -94,11 +105,15 @@ function ContactLink({
       >
         {icon}
       </span>
+
       <span className="min-w-0">
         <span className="block font-display text-sm font-semibold tracking-[0.12em] uppercase">
           {label}
         </span>
-        <span className="mt-0.5 block truncate text-sm text-muted-foreground">{detail}</span>
+
+        <span className="mt-0.5 block truncate text-sm text-muted-foreground">
+          {detail}
+        </span>
       </span>
     </>
   );
@@ -114,8 +129,8 @@ function ContactLink({
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noreferrer noopener"
+      target={isEmail ? undefined : "_blank"}
+      rel={isEmail ? undefined : "noreferrer noopener"}
       className="hairline-card flex items-center gap-4 rounded-2xl p-5 transition-transform duration-400 hover:-translate-y-1"
     >
       {inner}
