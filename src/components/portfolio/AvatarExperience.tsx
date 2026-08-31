@@ -55,13 +55,13 @@ export function AvatarExperience({
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute rounded-full blur-[60px] sm:blur-[80px]",
+          "pointer-events-none absolute rounded-full blur-[52px] sm:blur-[80px]",
           size === "lg" ? "inset-[-8%]" : "inset-[-10%]",
         )}
         style={{
           background:
             "conic-gradient(from 200deg, var(--pink), var(--magenta), var(--violet), var(--orange), var(--yellow), var(--pink))",
-          opacity: active ? 0.72 : 0.55,
+          opacity: active ? 0.9 : 0.72,
           animation: reduced ? undefined : "aura-breathe 14s ease-in-out infinite",
         }}
       />
@@ -69,12 +69,12 @@ export function AvatarExperience({
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute rounded-full blur-[34px]",
+          "pointer-events-none absolute rounded-full blur-[30px]",
           size === "lg" ? "inset-[4%]" : "inset-[6%]",
         )}
         style={{
-          background: `radial-gradient(circle at 40% 30%, color-mix(in oklab, ${accent} 70%, transparent) 0%, transparent 68%)`,
-          opacity: 0.55,
+          background: `radial-gradient(circle at 42% 32%, color-mix(in oklab, ${accent} 88%, transparent) 0%, transparent 66%)`,
+          opacity: 0.72,
         }}
       />
 
@@ -108,32 +108,33 @@ export function AvatarExperience({
         {/* Thin orbital rings with travelling light points */}
         <div
           aria-hidden="true"
-          className="absolute inset-[-6%] rounded-full border border-white/8"
+          className="absolute inset-[-6%] rounded-full border border-white/5"
           style={{ animation: reduced ? undefined : "ring-spin 60s linear infinite" }}
         >
           <span
-            className="absolute top-0 left-1/2 block h-1.5 w-1.5 -translate-x-1/2 rounded-full"
-            style={{ background: "var(--yellow)", boxShadow: "0 0 14px var(--yellow)" }}
+            className="absolute top-0 left-1/2 block h-1 w-1 -translate-x-1/2 rounded-full"
+            style={{ background: "var(--yellow)", boxShadow: "0 0 10px var(--yellow)" }}
           />
         </div>
         <div
           aria-hidden="true"
-          className="absolute inset-0 rounded-full border border-dashed border-white/14"
+          className="absolute inset-0 rounded-full border border-dashed border-white/8"
           style={{ animation: reduced ? undefined : "ring-spin 44s linear infinite" }}
         >
           <span
-            className="absolute top-0 left-1/2 block h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ background: accent, boxShadow: `0 0 18px ${accent}` }}
+            className="absolute top-0 left-1/2 block h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
           />
         </div>
         <div
           aria-hidden="true"
-          className="absolute inset-[7%] rounded-full border border-white/8"
+          className="absolute inset-[7%] rounded-full border border-white/5"
           style={{
             animation: reduced ? undefined : "ring-spin 70s linear infinite reverse",
             maskImage: "linear-gradient(200deg, #000 30%, transparent 70%)",
           }}
         />
+
 
         {/* Avatar placeholder core — deliberately no generated face */}
         <div
@@ -146,16 +147,24 @@ export function AvatarExperience({
           role="img"
           aria-label={`Placeholder for Avika's interactive AI avatar. Current state: ${copy.label}`}
         >
-          <div className="flex flex-col items-center gap-2 px-4 text-center">
+          <div className="flex w-full -translate-y-[3%] flex-col items-center gap-1 px-2 text-center sm:gap-2 sm:px-3">
             <AssistantCharacter
               state={state === "error" ? "error" : state}
               accent={accent}
-              className="w-[74%]"
+              className="w-[78%] max-w-full sm:w-[80%]"
             />
-            <p className="font-display text-[0.58rem] tracking-[0.34em] text-muted-foreground/80 uppercase">
+
+            <p
+              className="rounded-full px-2.5 py-0.5 font-display text-[0.55rem] tracking-[0.34em] text-foreground/85 uppercase backdrop-blur-sm sm:text-[0.58rem]"
+              style={{
+                background: "oklch(0.08 0.01 300 / 55%)",
+                textShadow: "0 1px 6px oklch(0.05 0 0 / 90%)",
+              }}
+            >
               Digital presence
             </p>
           </div>
+
 
 
           {/* State visual: waveform or processing dots */}
