@@ -379,7 +379,14 @@ export const contact = {
     "Interested in AI, technology, products, or building something meaningful?",
   links: {
     github: { label: "GitHub", url: "https://github.com/avikanigam01" },
-    linkedin: { label: "LinkedIn", url: null, placeholder: PLACEHOLDER },
-    email: { label: "Email", url: null, placeholder: PLACEHOLDER },
+    linkedin: {
+  label: "LinkedIn",
+  url: "https://www.linkedin.com/in/avika-nigam-1b443a381/",
+},
+
+email: {
+  label: "Email",
+  url: "mailto:avikanigam01@gmail.com",
+},
   },
 } as const;
