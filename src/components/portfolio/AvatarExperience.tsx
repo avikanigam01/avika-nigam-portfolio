@@ -147,12 +147,13 @@ export function AvatarExperience({
           role="img"
           aria-label={`Placeholder for Avika's interactive AI avatar. Current state: ${copy.label}`}
         >
-          <div className="flex w-full flex-col items-center gap-1 px-2 text-center sm:gap-2 sm:px-3">
+          <div className="flex w-full -translate-y-[3%] flex-col items-center gap-1 px-2 text-center sm:gap-2 sm:px-3">
             <AssistantCharacter
               state={state === "error" ? "error" : state}
               accent={accent}
-              className="w-[92%] max-w-full sm:w-[94%]"
+              className="w-[78%] max-w-full sm:w-[80%]"
             />
+
             <p
               className="rounded-full px-2.5 py-0.5 font-display text-[0.55rem] tracking-[0.34em] text-foreground/85 uppercase backdrop-blur-sm sm:text-[0.58rem]"
               style={{
