@@ -34,7 +34,7 @@ export function Contact({ onTalk }: { onTalk: () => void }) {
               <ContactLink
                 href={contact.links.email.url}
                 label={contact.links.email.label}
-                detail="mailto:avikanigam01@gmail.com">"
+                detail="avikanigam01@gmail.com"
                 icon={<Mail className="h-4.5 w-4.5" aria-hidden="true" />}
                 accent="var(--orange)"
               />
