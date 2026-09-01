@@ -32,22 +32,24 @@ export function Footer() {
             </a>
           </li>
           <li>
-            <span
-              className="grid h-11 w-11 place-items-center rounded-full border border-white/8 text-muted-foreground/60"
-              title={`LinkedIn — ${contact.links.linkedin.placeholder}`}
+            <a
+              href={contact.links.linkedin.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="LinkedIn profile"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/12 transition-colors hover:border-pink/60 hover:bg-white/5"
             >
               <Linkedin className="h-4.5 w-4.5" aria-hidden="true" />
-              <span className="sr-only">LinkedIn — {contact.links.linkedin.placeholder}</span>
-            </span>
+            </a>
           </li>
           <li>
-            <span
-              className="grid h-11 w-11 place-items-center rounded-full border border-white/8 text-muted-foreground/60"
-              title={`Email — ${contact.links.email.placeholder}`}
+            <a
+              href={contact.links.email.url}
+              aria-label="Email Avika"
+              className="grid h-11 w-11 place-items-center rounded-full border border-white/12 transition-colors hover:border-pink/60 hover:bg-white/5"
             >
               <Mail className="h-4.5 w-4.5" aria-hidden="true" />
-              <span className="sr-only">Email — {contact.links.email.placeholder}</span>
-            </span>
+            </a>
           </li>
         </ul>
       </div>
