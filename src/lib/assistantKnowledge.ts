@@ -67,11 +67,11 @@ function leadershipAnswer() {
 }
 
 function contactAnswer() {
-  const parts = Object.values(contact.links).map((l) =>
-    l.url ? `${l.label}: ${l.url}` : `${l.label}: to be added`,
-  );
+  const entries = Object.values(contact.links) as { label: string; url?: string }[];
+  const parts = entries.map((l) => (l.url ? `${l.label}: ${l.url}` : `${l.label}: to be added`));
   return `${contact.supporting} ${parts.join(". ")}. You can also use the contact form in the Contact section.`;
 }
+
 
 function bringAnswer() {
   return whatIBring.map((w) => `${w.title} — ${sentence(w.body)}`).join(" ");
