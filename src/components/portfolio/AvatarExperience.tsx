@@ -20,12 +20,13 @@ import { cn } from "@/lib/utils";
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking" | "error";
 
 const STATE_COPY: Record<AvatarState, { label: string; hint: string }> = {
-  idle: { label: "Talk to me", hint: "Preview experience — voice is not live yet." },
+  idle: { label: "Talk to me", hint: "Tap the mic and ask me anything about Avika." },
   listening: { label: "Listening...", hint: "Capturing your question." },
   thinking: { label: "Thinking...", hint: "Working out a response." },
   speaking: { label: "Avika is speaking", hint: "Responding out loud." },
-  error: { label: "Microphone blocked", hint: "Allow microphone access to try the preview." },
+  error: { label: "Microphone blocked", hint: "Allow microphone access, or type your question." },
 };
+
 
 const STATE_ACCENT: Record<AvatarState, string> = {
   idle: "var(--pink)",

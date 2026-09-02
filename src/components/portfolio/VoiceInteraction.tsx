@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Info, RotateCcw, Send, Mic } from "lucide-react";
+import { RotateCcw, Send, Mic, MicOff, Square, Volume2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,15 @@ import { AssistantCharacter, type AssistantState } from "./AssistantCharacter";
 import { profile } from "@/data/portfolioData";
 import { ASSISTANT_GREETING, ASSISTANT_SUGGESTIONS } from "@/lib/assistantKnowledge";
 import { askAssistant, type AssistantTurn } from "@/lib/askAssistant";
+import {
+  RECOGNITION_MESSAGES,
+  cancelSpeech,
+  isSpeechRecognitionSupported,
+  isSpeechSynthesisSupported,
+  speak,
+  startRecognition,
+  warmUpVoices,
+} from "@/lib/speech";
 
 type Turn = { id: number; role: "you" | "assistant"; text: string };
 
@@ -25,14 +34,15 @@ const STATE_LABEL: Record<AssistantState, string> = {
 };
 
 /**
- * Avika's AI Assistant — Stage 2: character + all states + real AI answers.
- * Typed questions are sent to the `ask-assistant` Supabase Edge Function,
- * which calls Gemini with Avika's portfolio content as grounding (see
- * src/lib/askAssistant.ts). If that call fails, answers fall back to the
- * local Stage 1 matcher so the assistant never goes silent.
- * Voice input (SpeechRecognition) and spoken replies (SpeechSynthesis)
- * arrive in Stage 3 and Stage 4; this component is the stable UI contract
- * for both — the mic button below is still a preview-mode placeholder.
+ * Avika's AI Assistant — Stage 3: character + all states + real AI answers
+ * + live browser voice.
+ *
+ * Typed or spoken questions are sent to the existing `ask-assistant` Supabase
+ * Edge Function, which calls Gemini with Avika's portfolio content as grounding
+ * (see src/lib/askAssistant.ts). Voice input uses the browser's native
+ * SpeechRecognition API and replies are spoken with window.speechSynthesis
+ * (see src/lib/speech.ts) — no external voice service and no API key on the
+ * client. Text chat stays fully functional when voice is unsupported.
  */
 export function VoiceInteraction({
   open,
@@ -47,25 +57,46 @@ export function VoiceInteraction({
   ]);
   const [draft, setDraft] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
+  const [voiceSupported, setVoiceSupported] = useState(true);
+  const [ttsSupported, setTtsSupported] = useState(true);
   const lastQuestion = useRef<string>("");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const scroller = useRef<HTMLDivElement | null>(null);
   const nextId = useRef(1);
+  const recognizer = useRef<{ stop: () => void } | null>(null);
+  const speaker = useRef<{ cancel: () => void } | null>(null);
+  const turnsRef = useRef(turns);
+  turnsRef.current = turns;
+
+  useEffect(() => {
+    setVoiceSupported(isSpeechRecognitionSupported());
+    setTtsSupported(isSpeechSynthesisSupported());
+    warmUpVoices();
+  }, []);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
   }, []);
 
-  useEffect(() => () => clearTimers(), [clearTimers]);
+  const stopEverything = useCallback(() => {
+    clearTimers();
+    recognizer.current?.stop();
+    recognizer.current = null;
+    speaker.current?.cancel();
+    speaker.current = null;
+    cancelSpeech();
+  }, [clearTimers]);
+
+  useEffect(() => () => stopEverything(), [stopEverything]);
 
   useEffect(() => {
     if (!open) {
-      clearTimers();
+      stopEverything();
       setState("idle");
       setNotice(null);
     }
-  }, [open, clearTimers]);
+  }, [open, stopEverything]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -81,20 +112,34 @@ export function VoiceInteraction({
       setDraft("");
 
       // Snapshot turn history (for context) before adding the new question.
-      const history: AssistantTurn[] = turns.map((t) => ({ role: t.role, text: t.text }));
+      const history: AssistantTurn[] = turnsRef.current.map((t) => ({
+        role: t.role,
+        text: t.text,
+      }));
       setTurns((prev) => [...prev, { id: nextId.current++, role: "you", text: q }]);
       setState("thinking");
 
       askAssistant(q, history)
         .then(({ answer, isFallback }) => {
           setTurns((prev) => [...prev, { id: nextId.current++, role: "assistant", text: answer }]);
-          setState("speaking");
           if (isFallback) {
             setNotice(
               "The live AI is briefly unavailable, so that answer came from the portfolio's built-in knowledge instead.",
             );
           }
-          timers.current.push(setTimeout(() => setState("idle"), 1600));
+
+          // Speak the answer aloud; the answer stays visible either way.
+          setState("speaking");
+          speaker.current = speak(answer, {
+            onEnd: () => {
+              speaker.current = null;
+              setState("idle");
+            },
+            onError: () => {
+              // Synthesis unavailable/failed — the text answer is already shown.
+              setTtsSupported(isSpeechSynthesisSupported());
+            },
+          });
         })
         .catch(() => {
           setState("error");
@@ -102,28 +147,80 @@ export function VoiceInteraction({
           timers.current.push(setTimeout(() => setState("idle"), 2000));
         });
     },
-    [clearTimers, turns],
+    [clearTimers],
   );
 
   const startVoice = useCallback(() => {
+    // Clicking the mic while the assistant is speaking stops the speech and
+    // resets to idle — a fresh session then needs another click.
+    if (state === "speaking") {
+      stopEverything();
+      setState("idle");
+      return;
+    }
+    if (state === "thinking") return;
+
+    if (state === "listening") {
+      stopEverything();
+      setState("idle");
+      return;
+    }
+
+    if (!isSpeechRecognitionSupported()) {
+      setVoiceSupported(false);
+      setNotice(RECOGNITION_MESSAGES.unsupported);
+      return;
+    }
+
+    stopEverything();
+    setNotice(null);
+
+    recognizer.current = startRecognition({
+      onStart: () => setState("listening"),
+      onResult: (transcript) => {
+        recognizer.current = null;
+        ask(transcript);
+      },
+      onError: (kind) => {
+        recognizer.current = null;
+        if (kind === "unsupported") setVoiceSupported(false);
+        setState("error");
+        setNotice(RECOGNITION_MESSAGES[kind]);
+        clearTimers();
+        timers.current.push(setTimeout(() => setState("idle"), 1800));
+      },
+    });
+
+    if (!recognizer.current) {
+      setState("error");
+      setNotice(RECOGNITION_MESSAGES.unknown);
+      timers.current.push(setTimeout(() => setState("idle"), 1800));
+      return;
+    }
     setState("listening");
-    setNotice(
-      "Live voice input is coming in the next stage of this assistant. You can type your question below — it works fully.",
-    );
-    clearTimers();
-    timers.current.push(setTimeout(() => setState("idle"), 2400));
-  }, [clearTimers]);
+  }, [ask, clearTimers, state, stopEverything]);
+
+  const stopSpeaking = useCallback(() => {
+    stopEverything();
+    setState("idle");
+  }, [stopEverything]);
 
   const busy = state === "thinking" || state === "speaking";
+  const micLabel =
+    state === "listening"
+      ? "Stop listening"
+      : state === "speaking"
+        ? "Stop speaking"
+        : "Speak to Avika's assistant";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg overflow-hidden border-white/10 bg-background/95 backdrop-blur-xl sm:max-w-2xl">
         <DialogHeader className="text-left">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow/40 px-2.5 py-1 font-display text-[0.62rem] tracking-[0.2em] text-yellow uppercase">
-              <Info className="h-3 w-3" aria-hidden="true" />
-              Preview mode
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-pink/40 px-2.5 py-1 font-display text-[0.62rem] tracking-[0.2em] text-pink uppercase">
+              <Volume2 className="h-3 w-3" aria-hidden="true" />
+              Voice live
             </span>
             <span className="font-display text-[0.62rem] tracking-[0.2em] text-muted-foreground uppercase">
               {STATE_LABEL[state]}
@@ -133,8 +230,8 @@ export function VoiceInteraction({
             {profile.shortName}&apos;s AI Assistant
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Ask about Avika&apos;s projects, skills, journey or goals. Answers come only from this
-            portfolio&apos;s own content — spoken voice is not live yet.
+            Tap the mic and ask me anything about Avika — or type instead. Answers come only from
+            this portfolio&apos;s own content, and are spoken back to you.
           </DialogDescription>
         </DialogHeader>
 
@@ -164,6 +261,11 @@ export function VoiceInteraction({
                   </span>
                 </p>
               ))}
+              {state === "listening" ? (
+                <p className="font-display text-[0.62rem] tracking-[0.2em] text-violet uppercase">
+                  Listening...
+                </p>
+              ) : null}
               {state === "thinking" ? (
                 <p className="font-display text-[0.62rem] tracking-[0.2em] text-yellow uppercase">
                   Thinking...
@@ -220,18 +322,38 @@ export function VoiceInteraction({
                 variant="secondary"
                 className="rounded-full"
                 onClick={startVoice}
-                aria-label="Start voice conversation"
+                disabled={state === "thinking"}
+                aria-label={micLabel}
+                aria-pressed={state === "listening"}
               >
-                <Mic className="h-4 w-4" aria-hidden="true" />
-                Talk
+                {voiceSupported ? (
+                  <Mic className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <MicOff className="h-4 w-4" aria-hidden="true" />
+                )}
+                {state === "listening" ? "Listening" : "Talk"}
               </Button>
+
+              {state === "speaking" ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="rounded-full text-muted-foreground"
+                  onClick={stopSpeaking}
+                  aria-label="Stop speaking"
+                >
+                  <Square className="h-4 w-4" aria-hidden="true" />
+                  Stop
+                </Button>
+              ) : null}
+
               {lastQuestion.current ? (
                 <Button
                   type="button"
                   variant="ghost"
                   className="rounded-full text-muted-foreground"
                   onClick={() => ask(lastQuestion.current)}
-                  disabled={busy}
+                  disabled={busy || state === "listening"}
                 >
                   <RotateCcw className="h-4 w-4" aria-hidden="true" />
                   Retry
@@ -244,11 +366,19 @@ export function VoiceInteraction({
                 {notice}
               </p>
             ) : null}
+            {!voiceSupported ? (
+              <p className="text-xs text-muted-foreground">
+                Voice input isn&apos;t supported in this browser. You can still type your question.
+              </p>
+            ) : null}
           </div>
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          Preview experience — voice is not live yet. {profile.avatarHelper}
+          {ttsSupported
+            ? "Live browser voice — speak or type."
+            : "Spoken replies aren't supported in this browser; answers appear as text."}{" "}
+          {profile.avatarHelper}
         </p>
       </DialogContent>
     </Dialog>
