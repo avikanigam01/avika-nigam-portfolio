@@ -2,8 +2,10 @@
  * Stage 1 knowledge layer for Avika's AI Assistant.
  *
  * Every answer below is derived from the centralized portfolio data — nothing is
- * invented. In Stage 2 this local matcher is replaced by a secure server call
- * that sends the same grounding data to an AI model; the UI contract stays the same.
+ * invented. As of Stage 2, the assistant primarily answers via the `ask-assistant`
+ * Supabase Edge Function (Gemini, grounded in the same facts) — see
+ * src/lib/askAssistant.ts. This local rule-based matcher now serves as the
+ * offline/error fallback so the assistant always has something grounded to say.
  */
 import {
   aboutCards,
