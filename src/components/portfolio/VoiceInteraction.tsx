@@ -11,11 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AssistantCharacter, type AssistantState } from "./AssistantCharacter";
 import { profile } from "@/data/portfolioData";
-import {
-  ASSISTANT_GREETING,
-  ASSISTANT_SUGGESTIONS,
-  answerQuestion,
-} from "@/lib/assistantKnowledge";
+import { ASSISTANT_GREETING, ASSISTANT_SUGGESTIONS } from "@/lib/assistantKnowledge";
+import { askAssistant, type AssistantTurn } from "@/lib/askAssistant";
 
 type Turn = { id: number; role: "you" | "assistant"; text: string };
 
@@ -28,10 +25,14 @@ const STATE_LABEL: Record<AssistantState, string> = {
 };
 
 /**
- * Avika's AI Assistant — Stage 1: character + all states + working text chat
- * grounded in the centralized portfolio data. Voice (SpeechRecognition /
- * SpeechSynthesis) and the server-side model call arrive in later stages;
- * this component is the stable UI contract for both.
+ * Avika's AI Assistant — Stage 2: character + all states + real AI answers.
+ * Typed questions are sent to the `ask-assistant` Supabase Edge Function,
+ * which calls Gemini with Avika's portfolio content as grounding (see
+ * src/lib/askAssistant.ts). If that call fails, answers fall back to the
+ * local Stage 1 matcher so the assistant never goes silent.
+ * Voice input (SpeechRecognition) and spoken replies (SpeechSynthesis)
+ * arrive in Stage 3 and Stage 4; this component is the stable UI contract
+ * for both — the mic button below is still a preview-mode placeholder.
  */
 export function VoiceInteraction({
   open,
@@ -78,19 +79,30 @@ export function VoiceInteraction({
       setNotice(null);
       lastQuestion.current = q;
       setDraft("");
+
+      // Snapshot turn history (for context) before adding the new question.
+      const history: AssistantTurn[] = turns.map((t) => ({ role: t.role, text: t.text }));
       setTurns((prev) => [...prev, { id: nextId.current++, role: "you", text: q }]);
       setState("thinking");
 
-      timers.current.push(
-        setTimeout(() => {
-          const reply = answerQuestion(q);
-          setTurns((prev) => [...prev, { id: nextId.current++, role: "assistant", text: reply }]);
+      askAssistant(q, history)
+        .then(({ answer, isFallback }) => {
+          setTurns((prev) => [...prev, { id: nextId.current++, role: "assistant", text: answer }]);
           setState("speaking");
+          if (isFallback) {
+            setNotice(
+              "The live AI is briefly unavailable, so that answer came from the portfolio's built-in knowledge instead.",
+            );
+          }
           timers.current.push(setTimeout(() => setState("idle"), 1600));
-        }, 900),
-      );
+        })
+        .catch(() => {
+          setState("error");
+          setNotice("Something went wrong reaching the assistant. Please try again.");
+          timers.current.push(setTimeout(() => setState("idle"), 2000));
+        });
     },
-    [clearTimers],
+    [clearTimers, turns],
   );
 
   const startVoice = useCallback(() => {
