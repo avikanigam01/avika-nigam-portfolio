@@ -162,7 +162,7 @@ export function AvatarExperience({
                 textShadow: "0 1px 6px oklch(0.05 0 0 / 90%)",
               }}
             >
-              Digital presence
+              Avika&apos;s AI assistant
             </p>
           </div>
 
