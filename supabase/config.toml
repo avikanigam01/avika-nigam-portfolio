@@ -1,1 +1,11 @@
 project_id = "ezmajvffdxswamfqxmpd"
+
+# ask-assistant is called anonymously from every visitor's browser (no login
+# on this site at all), using the new-style `sb_publishable_...` key. That
+# key is an opaque string, not a JWT, so Supabase's default JWT verification
+# on Edge Functions will reject every request from src/integrations/supabase/client.ts
+# before the function code ever runs (see the FunctionsFetchError this was
+# causing in production). This function does its own input validation and
+# does not need a logged-in user, so JWT verification is explicitly disabled.
+[functions.ask-assistant]
+verify_jwt = false
